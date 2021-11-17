@@ -102,7 +102,37 @@ def main_loop():
         print(f"\n{new_username} has been registered.\n")
         print(dashes)
 
-    reg_user()
+    def add_task():
+
+        # Get list of all usernames
+        users = get_usernames()
+
+        while True:
+            # Request assigned user
+            assigned_user = input("Assigned to: ")
+
+            # Check if assigned user exists
+            if assigned_user not in users:
+                print(f"{assigned_user} has not been registered.\n")
+            else:
+                break
+
+        # Request task details
+        task = input("Task: ")
+        date_assigned = input("Date assigned (d/m/y): ")
+        due_date = input("Due date (d/m/y): ")
+        description = input("Task description: ")
+
+        # Append task details to tasks.txt
+        with open("tasks.txt", "a") as tasks:
+            tasks.write(f"\nAssigned to:       {assigned_user},Task:              {task},"
+                        f"Date assigned:     {date_assigned},Due date:          {due_date},"
+                        f"Task description:  {description},Task completed:    No")
+
+        print("\nTask added")
+        print(f"{dashes}\n")
+
+    add_task()
 
 
 main_loop()
