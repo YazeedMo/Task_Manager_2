@@ -64,12 +64,45 @@ def main_loop():
             else:
                 current_user.clear()
                 current_user.append(username)
-                
+
                 print(f"\nWelcome back {username}\n")
                 print(dashes)
                 entry = True
 
-    login()
+    # Function to register a new user
+    def reg_user():
+
+        # Get list of all users
+        usernames = get_usernames()
+
+        while True:
+            # Request new username
+            new_username = input("Username: ")
+
+            # Check if username already taken
+            if new_username in usernames:
+                print(f"{new_username} is already registered.\n")
+            else:
+                while True:
+                    # Request password and password confirmation
+                    new_password = input("Password: ")
+                    new_password_confirm = input("Confirm password: ")
+
+                    # Check if both password are the same
+                    if new_password != new_password_confirm:
+                        print("Password do not match.\n")
+                    else:
+                        break
+                break
+
+        # Append new user details to users.txt
+        with open("users.txt", "a") as users:
+            users.write(f"\n{new_username}, {new_password}")
+
+        print(f"\n{new_username} has been registered.\n")
+        print(dashes)
+
+    reg_user()
 
 
 main_loop()
