@@ -1,6 +1,12 @@
 # Function "main_loop" - loops over the whole programme
 def main_loop():
 
+    print("\n===== Task Manger =====\n\n")
+    dashes = "--------------------------------------------------"
+
+    # Store username of current user
+    current_user = []
+
     # Function to return all usernames
     def get_usernames():
 
@@ -38,6 +44,32 @@ def main_loop():
                 passwords.append(password)
 
         return passwords
+
+    # Functions to allow users to login
+    def login():
+
+        entry = False
+        while not entry:
+            # Get list of usernames and passwords
+            usernames = get_usernames()
+            passwords = get_passwords()
+
+            # Request username and password
+            username = input("Username: ").strip()
+            password = input("Password: ").strip()
+
+            # Check if username and passwords match
+            if username not in usernames or password != passwords[usernames.index(username)]:
+                print("\nIncorrect username or password.\n")
+            else:
+                current_user.clear()
+                current_user.append(username)
+                
+                print(f"\nWelcome back {username}\n")
+                print(dashes)
+                entry = True
+
+    login()
 
 
 main_loop()
