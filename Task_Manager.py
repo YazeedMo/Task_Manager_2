@@ -102,6 +102,7 @@ def main_loop():
         print(f"\n{new_username} has been registered.\n")
         print(dashes)
 
+    # Function to add new task
     def add_task():
 
         # Get list of all usernames
@@ -132,7 +133,28 @@ def main_loop():
         print("\nTask added")
         print(f"{dashes}\n")
 
-    add_task()
+    # Function to view all tasks
+    def view_all():
+
+        # Get a list of all tasks from tasks.txt
+        with open("tasks.txt", "r") as tasks:
+            tasks = tasks.read().strip()
+
+        tasks_list = tasks.split("\n")
+
+        # Use string handling to display all tasks in an easy-to-read format
+        tasks_string = ""
+
+        for task in tasks_list:
+            task_details = task.split(",")
+            for detail in task_details:
+                tasks_string += detail + "\n"
+            tasks_string += "\n\n" + "**************************************************" + "\n\n"
+
+        print("**************************************************\n")
+        print(tasks_string)
+
+    view_all()
 
 
 main_loop()
