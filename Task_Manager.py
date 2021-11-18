@@ -10,52 +10,68 @@ def main_loop():
     # Function to display "main menu"
     def commands():
 
+        space_dashes = "\n" + dashes + "\n"
+
         # If current user is the admin - show all options
         def admin_commands():
             command = input("""Select one of the following options:
-            r --> Register user
-            a --> Add task
-            va --> View all tasks
-            vm --> View my tasks
-            e --> Log out
+r  --> Register user
+a  --> Add task
+va --> View all tasks
+vm --> View my tasks
+e  --> Log out
             
-            > """)
+> """).lower()
 
             if command == "r":
+                print(space_dashes)
                 reg_user()
             elif command == "a":
+                print(space_dashes)
                 add_task()
             elif command == "va":
+                print(space_dashes)
                 view_all()
             elif command == "vm":
+                print(space_dashes)
                 view_mine()
             elif command == "e":
+                print(space_dashes)
                 main_loop()
             else:
-                print(f"{command} is not an option.\n")
+                print(f"\n{command} is not an option.\n")
                 commands()
 
         # If current user is not the admin - show only certain options
         def user_commands():
 
             command = input("""Select one of the following options:
-            a --> Add task
-            va --> View all tasks
-            vm --> View my tasks
-            e --> exit
-            
-            > """).lower()
+a  --> Add task
+va --> View all tasks
+vm --> View my tasks
+e  --> exit
+
+> """).lower()
 
             if command == "a":
+                print(space_dashes)
                 add_task()
             elif command == "va":
+                print(space_dashes)
                 view_all()
             elif command == "vm":
+                print(space_dashes)
                 view_mine()
             elif command == "e":
+                print(space_dashes)
                 main_loop()
             else:
-                print(f"{command} is not an option.\n")
+                print(f"\n{command} is not an option.\n")
+
+        if current_user[0] == "admin":
+            admin_commands()
+        else:
+            user_commands()
 
     # Function to return all usernames
     def get_usernames():
@@ -115,9 +131,12 @@ def main_loop():
                 current_user.clear()
                 current_user.append(username)
 
-                print(f"\nWelcome back {username}\n")
+                print(f"\nWelcome back {username}.\n")
                 print(dashes)
+                print()
                 entry = True
+
+        commands()
 
     # Function to register a new user
     def reg_user():
@@ -131,7 +150,7 @@ def main_loop():
 
             # Check if username already taken
             if new_username in usernames:
-                print(f"{new_username} is already registered.\n")
+                print(f"\n{new_username} is already registered.\n")
             else:
                 while True:
                     # Request password and password confirmation
@@ -140,7 +159,7 @@ def main_loop():
 
                     # Check if both password are the same
                     if new_password != new_password_confirm:
-                        print("Password do not match.\n")
+                        print("\nPassword do not match.\n")
                     else:
                         break
                 break
@@ -151,6 +170,9 @@ def main_loop():
 
         print(f"\n{new_username} has been registered.\n")
         print(dashes)
+        print()
+
+        commands()
 
     # Function to add new task
     def add_task():
@@ -164,7 +186,7 @@ def main_loop():
 
             # Check if assigned user exists
             if assigned_user not in users:
-                print(f"{assigned_user} has not been registered.\n")
+                print(f"\n{assigned_user} has not been registered.\n")
             else:
                 break
 
@@ -182,6 +204,8 @@ def main_loop():
 
         print("\nTask added")
         print(f"{dashes}\n")
+
+        commands()
 
     # Function to view all tasks
     def view_all():
@@ -203,6 +227,10 @@ def main_loop():
 
         print("**************************************************\n")
         print(tasks_string)
+        print(dashes)
+
+        print()
+        commands()
 
     # Function to view current users tasks
     def view_mine():
@@ -229,6 +257,12 @@ def main_loop():
             my_tasks_string += "\n\n" + "**************************************************" + "\n\n"
 
         print(my_tasks_string)
+
+        print()
+        print(dashes)
+        print()
+
+        commands()
 
     login()
 
