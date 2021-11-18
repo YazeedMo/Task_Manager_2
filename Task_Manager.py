@@ -7,6 +7,56 @@ def main_loop():
     # Store username of current user
     current_user = []
 
+    # Function to display "main menu"
+    def commands():
+
+        # If current user is the admin - show all options
+        def admin_commands():
+            command = input("""Select one of the following options:
+            r --> Register user
+            a --> Add task
+            va --> View all tasks
+            vm --> View my tasks
+            e --> Log out
+            
+            > """)
+
+            if command == "r":
+                reg_user()
+            elif command == "a":
+                add_task()
+            elif command == "va":
+                view_all()
+            elif command == "vm":
+                view_mine()
+            elif command == "e":
+                main_loop()
+            else:
+                print(f"{command} is not an option.\n")
+                commands()
+
+        # If current user is not the admin - show only certain options
+        def user_commands():
+
+            command = input("""Select one of the following options:
+            a --> Add task
+            va --> View all tasks
+            vm --> View my tasks
+            e --> exit
+            
+            > """).lower()
+
+            if command == "a":
+                add_task()
+            elif command == "va":
+                view_all()
+            elif command == "vm":
+                view_mine()
+            elif command == "e":
+                main_loop()
+            else:
+                print(f"{command} is not an option.\n")
+
     # Function to return all usernames
     def get_usernames():
 
@@ -181,8 +231,6 @@ def main_loop():
         print(my_tasks_string)
 
     login()
-
-    view_mine()
 
 
 main_loop()
