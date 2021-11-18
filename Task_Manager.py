@@ -154,7 +154,35 @@ def main_loop():
         print("**************************************************\n")
         print(tasks_string)
 
-    view_all()
+    # Function to view current users tasks
+    def view_mine():
+
+        with open("tasks.txt", "r") as tasks:
+            tasks = tasks.read().strip()
+
+        tasks_list = tasks.split("\n")
+
+        # Create a list with all tasks assigned to current user
+        my_tasks = []
+        for task in tasks_list:
+            task_details = task.split(",")
+            if current_user[0] in task_details[0]:
+                my_tasks.append(task)
+
+        # Display tasks in an easy-to-read format
+        my_tasks_string = ""
+        print()
+        for task in my_tasks:
+            details = task.split(",")
+            for detail in details:
+                my_tasks_string += detail + "\n"
+            my_tasks_string += "\n\n" + "**************************************************" + "\n\n"
+
+        print(my_tasks_string)
+
+    login()
+
+    view_mine()
 
 
 main_loop()
