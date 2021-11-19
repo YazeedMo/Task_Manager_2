@@ -5,7 +5,13 @@ def main_loop():
     dashes = "--------------------------------------------------"
 
     # Store username of current user
-    current_user = []
+    current_user = ["admin"]
+
+    # function to clear a text file
+    def clear_txt(file):
+        # Open and clear the text file
+        with open(file, "w") as file:
+            file.write("")
 
     # Function to display "main menu"
     def commands():
@@ -19,6 +25,7 @@ r  --> Register user
 a  --> Add task
 va --> View all tasks
 vm --> View my tasks
+d  --> Remove user
 e  --> Log out
             
 > """).lower()
@@ -35,11 +42,16 @@ e  --> Log out
             elif command == "vm":
                 print(space_dashes)
                 view_mine()
+            elif command == "d":
+                print(space_dashes)
+                rem_user()
             elif command == "e":
                 print(space_dashes)
                 main_loop()
             else:
                 print(f"\n{command} is not an option.\n")
+                print(dashes)
+                print()
                 commands()
 
         # If current user is not the admin - show only certain options
@@ -67,6 +79,9 @@ e  --> exit
                 main_loop()
             else:
                 print(f"\n{command} is not an option.\n")
+                print(dashes)
+                print()
+                commands()
 
         if current_user[0] == "admin":
             admin_commands()
@@ -80,7 +95,7 @@ e  --> exit
         usernames = []
 
         with open("users.txt", "r") as users:
-            users = users.read()
+            users = users.read().strip()
 
         # Make a list of all usernames and passwords
         user_details = users.replace(",", "").replace("\n", " ").split(" ")
@@ -99,7 +114,7 @@ e  --> exit
         passwords = []
 
         with open("users.txt", "r") as users:
-            users = users.read()
+            users = users.read().strip()
 
         # Make a list of all usernames and passwords
         user_details = users.replace(",", "").replace("\n", " ").split(" ")
@@ -110,6 +125,17 @@ e  --> exit
                 passwords.append(password)
 
         return passwords
+
+    # Function to return list of all tasks
+    def get_tasks():
+
+        # Read contents from "tasks.txt" and store list of tasks in tasks_list
+        with open("tasks.txt", "r") as tasks:
+            tasks = tasks.read().strip()
+
+        tasks_list = tasks.split("\n")
+
+        return tasks_list
 
     # Functions to allow users to login
     def login():
@@ -141,8 +167,9 @@ e  --> exit
     # Function to register a new user
     def reg_user():
 
-        # Get list of all users
+        # Get list of usernames and passwords
         usernames = get_usernames()
+        passwords = get_passwords()
 
         while True:
             # Request new username
@@ -164,9 +191,16 @@ e  --> exit
                         break
                 break
 
-        # Append new user details to users.txt
-        with open("users.txt", "a") as users:
-            users.write(f"\n{new_username}, {new_password}")
+        # Add new username and password to the list
+        usernames.append(new_username)
+        passwords.append(new_password)
+
+        # Clear users.txt
+        clear_txt("users.txt")
+        # Append new username and password to users.txt
+        for username in usernames:
+            with open("users.txt", "a") as users:
+                users.write(f"{username}, {passwords[usernames.index(username)]}\n")
 
         print(f"\n{new_username} has been registered.\n")
         print(dashes)
@@ -174,10 +208,60 @@ e  --> exit
 
         commands()
 
+    # Function to remove a user
+    def rem_user():
+
+        # Get list of usernames, passwords and tasks
+        usernames = get_usernames()
+        passwords = get_passwords()
+        tasks = get_tasks()
+
+        print("WARNING: After removing a user, all tasks assigned to him/her will be deleted.\n")
+
+        while True:
+            # Request username of user being removed
+            user = input("Username of user being removed: ")
+
+            # Check if username exists
+            if user not in usernames:
+                print(f"\n{user} does not exist.\n")
+            elif user == "admin":
+                print("\nYou cannot remove yourself.\n")
+            else:
+                break
+
+        # Remove all tasks assigned to the removed user
+        for task in tasks:
+            details = task.split(",")
+            if user in details[0]:
+                tasks.remove(task)
+
+        # Clear tasks.txt
+        clear_txt("tasks.txt")
+        for task in tasks:
+            with open("tasks.txt", "a") as tasks:
+                tasks.write(f"{task}\n")
+
+        # Remove the user's password and username
+        passwords.pop(usernames.index(user))
+        usernames.remove(user)
+
+        # Clear users.txt
+        clear_txt("users.txt")
+        for username in usernames:
+            with open("users.txt", "a") as users:
+                users.write(f"{username}, {passwords[usernames.index(username)]}\n")
+
+        print(f"\nUser {user} successfully removed.\n")
+        print(dashes)
+        print()
+        commands()
+
     # Function to add new task
     def add_task():
 
-        # Get list of all usernames
+        # Get list of tasks and usernames
+        tasks_list = get_tasks()
         users = get_usernames()
 
         while True:
@@ -196,14 +280,19 @@ e  --> exit
         due_date = input("Due date (d/m/y): ")
         description = input("Task description: ")
 
-        # Append task details to tasks.txt
-        with open("tasks.txt", "a") as tasks:
-            tasks.write(f"\nAssigned to:       {assigned_user},Task:              {task},"
-                        f"Date assigned:     {date_assigned},Due date:          {due_date},"
-                        f"Task description:  {description},Task completed:    No")
+        tasks_list.append(f"Assigned to:       {assigned_user},Task:              {task},"
+                          f"Date assigned:     {date_assigned},Due date:          {due_date},"
+                          f"Task description:  {description},Task completed:    No")
+
+        # Clear tasks.txt
+        clear_txt("tasks.txt")
+        # Append each task to tasks.txt
+        for task in tasks_list:
+            with open("tasks.txt", "a") as tasks:
+                tasks.write(f"{task}\n")
 
         print("\nTask added")
-        print(f"{dashes}\n")
+        print(f"\n{dashes}\n")
 
         commands()
 
@@ -211,34 +300,32 @@ e  --> exit
     def view_all():
 
         # Get a list of all tasks from tasks.txt
-        with open("tasks.txt", "r") as tasks:
-            tasks = tasks.read().strip()
+        tasks_list = get_tasks()
 
-        tasks_list = tasks.split("\n")
+        if len(tasks_list) == 0 or len(tasks_list[0]) < 3:
+            print("There are no tasks.\n")
+            print(dashes)
+            print()
+        else:
+            # Use string handling to display all tasks in an easy-to-read format
+            tasks_string = ""
 
-        # Use string handling to display all tasks in an easy-to-read format
-        tasks_string = ""
+            for task in tasks_list:
+                task_details = task.split(",")
+                for detail in task_details:
+                    tasks_string += detail + "\n"
+                tasks_string += "\n\n" + "**************************************************" + "\n\n"
 
-        for task in tasks_list:
-            task_details = task.split(",")
-            for detail in task_details:
-                tasks_string += detail + "\n"
-            tasks_string += "\n\n" + "**************************************************" + "\n\n"
+            print(tasks_string)
+            print(dashes)
+            print()
 
-        print("**************************************************\n")
-        print(tasks_string)
-        print(dashes)
-
-        print()
         commands()
 
     # Function to view current users tasks
     def view_mine():
 
-        with open("tasks.txt", "r") as tasks:
-            tasks = tasks.read().strip()
-
-        tasks_list = tasks.split("\n")
+        tasks_list = get_tasks()
 
         # Create a list with all tasks assigned to current user
         my_tasks = []
@@ -248,15 +335,19 @@ e  --> exit
                 my_tasks.append(task)
 
         # Display tasks in an easy-to-read format
-        my_tasks_string = ""
-        print()
-        for task in my_tasks:
-            details = task.split(",")
-            for detail in details:
-                my_tasks_string += detail + "\n"
-            my_tasks_string += "\n\n" + "**************************************************" + "\n\n"
 
-        print(my_tasks_string)
+        if len(my_tasks) == 0:
+            print("You do not have any tasks.")
+        else:
+            my_tasks_string = ""
+            print()
+            for task in my_tasks:
+                details = task.split(",")
+                for detail in details:
+                    my_tasks_string += detail + "\n"
+                my_tasks_string += "\n\n" + "**************************************************" + "\n\n"
+
+            print(my_tasks_string)
 
         print()
         print(dashes)
