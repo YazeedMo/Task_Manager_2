@@ -1,5 +1,6 @@
 # Function "main_loop" - loops over the whole programme
 def main_loop():
+    import datetime
 
     print("\n===== Task Manger =====\n\n")
     dashes = "--------------------------------------------------"
@@ -260,6 +261,8 @@ e  --> exit
     # Function to add new task
     def add_task():
 
+        today = datetime.datetime.now()
+
         # Get list of tasks and usernames
         tasks_list = get_tasks()
         users = get_usernames()
@@ -276,8 +279,17 @@ e  --> exit
 
         # Request task details
         task = input("Task: ")
-        date_assigned = input("Date assigned (d/m/y): ")
-        due_date = input("Due date (d/m/y): ")
+        date_assigned = today.strftime("%Y/%m/%d")
+
+        while True:
+            due_date = input("Due date (y/m/d): ")
+            try:
+                test_date = datetime.datetime.strptime(due_date, "%Y/%m/%d")
+                break
+            except:
+                print()
+                print("Please enter date in correct format.\n")
+
         description = input("Task description: ")
 
         tasks_list.append(f"Assigned to:       {assigned_user},Task:              {task},"
@@ -325,6 +337,7 @@ e  --> exit
     # Function to view current users tasks
     def view_mine():
 
+        # Get list of all tasks
         tasks_list = get_tasks()
 
         # Create a list with all tasks assigned to current user
@@ -332,20 +345,18 @@ e  --> exit
         for task in tasks_list:
             task_details = task.split(",")
             if current_user[0] in task_details[0]:
-                my_tasks.append(task)
+                my_tasks.append(task.replace(",", "\n"))
 
         # Display tasks in an easy-to-read format
-
         if len(my_tasks) == 0:
             print("You do not have any tasks.")
         else:
+            count = 1
             my_tasks_string = ""
             print()
             for task in my_tasks:
-                details = task.split(",")
-                for detail in details:
-                    my_tasks_string += detail + "\n"
-                my_tasks_string += "\n\n" + "**************************************************" + "\n\n"
+                my_tasks_string += f"{count})\n{task}\n\n"
+                count += 1
 
             print(my_tasks_string)
 
