@@ -2,6 +2,9 @@
 def main_loop():
     import datetime
 
+    # Get today's date
+    today = datetime.datetime.now()
+
     print("\n===== Task Manger =====\n\n")
     dashes = "--------------------------------------------------"
 
@@ -261,8 +264,6 @@ e  --> exit
     # Function to add new task
     def add_task():
 
-        today = datetime.datetime.now()
-
         # Get list of tasks and usernames
         tasks_list = get_tasks()
         users = get_usernames()
@@ -284,7 +285,7 @@ e  --> exit
         while True:
             due_date = input("Due date (y/m/d): ")
             try:
-                test_date = datetime.datetime.strptime(due_date, "%Y/%m/%d")
+                _ = datetime.datetime.strptime(due_date, "%Y/%m/%d")
                 break
             except:
                 print()
@@ -307,6 +308,127 @@ e  --> exit
         print(f"\n{dashes}\n")
 
         commands()
+
+    # Function to edit task
+    def edit_task(number):
+
+        chosen_index = number - 1
+
+        # Get list of all tasks
+        tasks_list = get_tasks()
+
+        # Create list of all tasks assigned to current user
+        my_tasks = []
+        for task in tasks_list:
+            task_details = task.split(",")
+            if current_user[0] in task_details[0]:
+                my_tasks.append(task)
+
+        # Find chosen task in the the list containing all tasks
+        chosen_task = my_tasks[chosen_index]
+        chosen_task = tasks_list.index(chosen_task)
+        chosen_task = tasks_list[chosen_task]
+
+        # Remove the chosen task from tasks_list
+        tasks_list.remove(chosen_task)
+
+        # String that will be added back to tasks.txt
+        new_task_string = ""
+
+        while True:
+            # Separate all details and put it in a list
+            chosen_details = chosen_task.split(",")
+
+            # Request how to edit the task
+            command = input("\n1 --> Mark as complete.\n2 --> Change assigned user."
+                            "\n3 --> Change due date."
+                            "\n\n> ").strip()
+
+            # Edit task to be marked as completed
+            if command == "1":
+                chosen_details[5] = "Task completed:    Yes"
+                for detail in chosen_details:
+                    new_task_string += detail + ","
+                new_task_string = new_task_string[:-1]
+
+                tasks_list.append(new_task_string)
+
+                # Update tasks.txt
+                clear_txt("tasks.txt")
+                for task in tasks_list:
+                    with open("tasks.txt", "a") as tasks:
+                        tasks.write(f"{task}\n")
+
+                print("\nTask marked as complete.")
+
+                break
+
+            # Edit task to change assigned user
+            elif command == "2":
+                # Get list of all usernames
+                users_list = get_usernames()
+
+                while True:
+                    # Request new assigned user
+                    edit_user = input("Assigned user: ")
+
+                    if edit_user not in users_list:
+                        print(f"\n{edit_user} has not been registered.\n")
+                    else:
+                        chosen_details[0] = f"Assigned to:       {edit_user}"
+                        for detail in chosen_details:
+                            new_task_string += detail + ","
+                        new_task_string = new_task_string[:-1]
+
+                        tasks_list.append(new_task_string)
+
+                        # Update tasks.txt
+                        clear_txt("tasks.txt")
+                        for task in tasks_list:
+                            with open("tasks.txt", "a") as tasks:
+                                tasks.write(f"{task}\n")
+
+                        print("\nTask has been edited.\n")
+                        print(dashes)
+                        print()
+
+                        commands()
+                        break
+
+            # Edit task to change due date
+            elif command == "3":
+                # Request new due date
+                while True:
+                    due_date = input("Due date (y/m/d): ")
+                    try:
+                        _ = datetime.datetime.strptime(due_date, "%Y/%m/%d")
+                        break
+                    except:
+                        print()
+                        print("Please enter date in correct format.\n")
+
+                chosen_details[3] = f"Due date:          {due_date}"
+                for detail in chosen_details:
+                    new_task_string += detail + ","
+                new_task_string = new_task_string[:-1]
+
+                tasks_list.append(new_task_string)
+
+                # Update tasks.txt
+                clear_txt("tasks.txt")
+                for task in tasks_list:
+                    with open("tasks.txt", "a") as tasks:
+                        tasks.write(f"{task}\n")
+
+                print("\nTask has been edited.\n")
+                print(dashes)
+                print()
+
+                commands()
+                break
+
+            else:
+                print(f"\n{command} is not an option.\n")
 
     # Function to view all tasks
     def view_all():
@@ -340,7 +462,7 @@ e  --> exit
         # Get list of all tasks
         tasks_list = get_tasks()
 
-        # Create a list with all tasks assigned to current user
+        # Create list of all tasks assigned to current user
         my_tasks = []
         for task in tasks_list:
             task_details = task.split(",")
@@ -359,6 +481,31 @@ e  --> exit
                 count += 1
 
             print(my_tasks_string)
+
+            # Request which task to edit
+            command = input(f"\ne      --> Cancel."
+                            f"\n1 to {len(my_tasks)} --> Select task."
+                            f"\n\n> ")
+
+            while True:
+                try:
+                    if command == "e":
+                        print()
+                        print(dashes)
+                        print()
+                        commands()
+                        break
+                    elif int(command) <= len(my_tasks):
+                        edit_task(int(command))
+                        break
+                    else:
+                        print(f"\n{command} is not an option.\n")
+                        print(dashes)
+                        view_mine()
+                except:
+                    print(f"\n{command} is not an option.\n")
+                    print(dashes)
+                    view_mine()
 
         print()
         print(dashes)
